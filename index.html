@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Task Manager</h1>
+        <input type="text" id="taskInput" placeholder="Add a new task">
+        <button onclick="addTask()">Add</button>
+        <ul id="taskList"></ul>
+        <script>
+            // Load tasks from local storage on page load
+            window.onload = function() {
+                loadTasks();
+            };
+
+            // Function to add a new task
+            function addTask() {
+                const taskInput = document.getElementById("taskInput");
+                const taskList = document.getElementById("taskList");
+                const taskText = taskInput.value.trim();
+
+                if (taskText !== "") {
+                    const li = document.createElement("li");
+                    li.innerHTML = `
+                        <span>${taskText}</span>
+                        <button onclick="completeTask(this)">Complete</button>
+                    `;
+
+                    taskList.appendChild(li);
+
+                    // Save tasks to local storage
+                    saveTasks();
+
+                    // Clear input
+                    taskInput.value = "";
+                }
+            }
+
+            // Function to mark a task as complete
+            function completeTask(button) {
+                const li = button.parentElement;
+                li.classList.add("completed");
+
+                // Save tasks to local storage
+                saveTasks();
+            }
+
+            // Function to load tasks from local storage
+            function loadTasks() {
+                const taskList = document.getElementById("taskList");
+                const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+                for (const task of tasks) {
+                    const li = document.createElement("li");
+                    li.innerHTML = `
+                        <span>${task.text}</span>
+                        <button onclick="completeTask(this)">Complete</button>
+                    `;
+
+                    if (task.completed) {
+                        li.classList.add("completed");
+                    }
+
+                    taskList.appendChild(li);
+                }
+            }
+
+            // Function to save tasks to local storage
+            function saveTasks() {
+                const taskList = document.getElementById("taskList");
+                const tasks = [];
+
+                for (const li of taskList.getElementsByTagName("li")) {
+                    const task = {
+                        text: li.querySelector("span").textContent,
+                        completed: li.classList.contains("completed"),
+                    };
+
+                    tasks.push(task);
+                }
+
+                localStorage.setItem("tasks", JSON.stringify(tasks));
+            }
+        </script>
+    </div>
+</body>
+</html>
